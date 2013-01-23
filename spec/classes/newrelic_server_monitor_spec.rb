@@ -27,4 +27,21 @@ describe 'newrelic_server_monitor' do
 
     it { should contain_package('newrelic-sysmond').with_ensure('latest') }
   end
+  
+  describe 'setup commands on Debian based systems' do
+    let(:facts) { { :osfamily  => 'Debian' } }
+    
+    it { should contain_exec('add_newrelic_repo').with_command('/usr/bin/wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list') }
+    it { should contain_exec('add_newrelic_repo_key').with_command('/usr/bin/apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys 548C16BF') }
+    it { should contain_exec('update_repos').with_command('/usr/bin/apt-get update -y -qq') }
+  end
+  
+  describe 'setup commands on RHEL based systems' do
+    let(:facts) { { :osfamily  => 'RedHat' } }
+    
+    it { should contain_package('newrelic-repo').with_ensure('present') }
+    it { should contain_package('newrelic-repo').with_provider('rpm') }
+    it { should contain_package('newrelic-repo').with_source('http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm') }
+    it { should contain_exec('update_repos').with_command('/bin/true') }
+  end
 end

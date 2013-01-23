@@ -37,31 +37,38 @@ class newrelic_server_monitor (
       $add_repo_cmd     = '/usr/bin/wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list'
       $add_repo_key_cmd = '/usr/bin/apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys 548C16BF'
       $update_repos_cmd = '/usr/bin/apt-get update -y -qq'
+
+      exec { 'add_newrelic_repo':
+        command => $add_repo_cmd
+      }
+
+      exec { 'add_newrelic_repo_key':
+        command => $add_repo_key_cmd,
+        require => Exec[add_newrelic_repo]
+      }
+
+      exec { 'update_repos':
+        command => $update_repos_cmd,
+        require => Exec[add_newrelic_repo_key]
+      }
     }
 
     'RedHat': {
-      $add_repo_cmd     = '/usr/bin/rpm -Uvh http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm'
-      $add_repo_key_cmd = true
-      $update_repos_cmd = true
+      package { 'newrelic-repo':
+        ensure    => $package_ensure,
+        provider  => rpm,
+        source    => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm'
+      }
+
+      exec { 'update_repos':
+        command => '/bin/true',
+        require => Package[newrelic-repo]
+      }
     }
 
     default: {
       fail("The newrelic_server_monitor module does not support ${::osfamily}.")
     }
-  }
-
-  exec { 'add_newrelic_repo':
-    command => $add_repo_cmd
-  }
-
-  exec { 'add_newrelic_repo_key':
-    command => $add_repo_key_cmd,
-    require => Exec[add_newrelic_repo]
-  }
-
-  exec { 'update_repos':
-    command => $update_repos_cmd,
-    require => Exec[add_newrelic_repo_key]
   }
 
   package { 'newrelic-sysmond':
