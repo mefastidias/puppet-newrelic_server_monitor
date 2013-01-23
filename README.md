@@ -17,7 +17,6 @@ This module has been tested against the following versions of Puppet:
 
 * Puppet 3.0.2
 * Puppet 2.7.20
-* Puppet 2.6.17
 
 Requirements
 ------------
