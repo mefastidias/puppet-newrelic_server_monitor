@@ -61,7 +61,7 @@ class newrelic_server_monitor (
       package { 'newrelic-repo':
         ensure    => $package_ensure,
         provider  => 'rpm',
-        source    => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm',
+        content   => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm',
         before    => Package['newrelic-sysmond']
       }
     }
