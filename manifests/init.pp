@@ -61,7 +61,7 @@ class newrelic_server_monitor (
       package { 'newrelic-repo':
         ensure    => $package_ensure,
         provider  => 'rpm',
-        content   => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm',
+        source    => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm',
         before    => Package['newrelic-sysmond']
       }
     }
@@ -81,7 +81,7 @@ class newrelic_server_monitor (
     owner   => 'root',
     group   => 'newrelic',
     notify  => Service['newrelic-sysmond'],
-    source  => template('newrelic_server_monitor/nrsysmond.cfg.erb')
+    content  => template('newrelic_server_monitor/nrsysmond.cfg.erb')
   }
 
   service { 'newrelic-sysmond':
