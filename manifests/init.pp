@@ -25,9 +25,9 @@ class newrelic_server_monitor (
   }
 
   if $use_latest == true {
-    $package_ensure = latest
+    $package_ensure = 'latest'
   } elsif $use_latest == false {
-    $package_ensure = present
+    $package_ensure = 'present'
   } else {
     fail('The use_latest parameter must be true or false.')
   }
@@ -39,30 +39,30 @@ class newrelic_server_monitor (
       $update_repos_cmd = '/usr/bin/apt-get update -y -qq'
 
       exec { 'add_newrelic_repo':
-        command => $add_repo_cmd
+        command => $add_repo_cmd,
+        unless  => '/usr/bin/test -f /etc/apt/sources.list.d/newrelic.list'
       }
 
       exec { 'add_newrelic_repo_key':
         command => $add_repo_key_cmd,
-        require => Exec[add_newrelic_repo]
+        require => Exec['add_newrelic_repo'],
+        unless  => '/usr/bin/test -f /etc/apt/sources.list.d/newrelic.list'
       }
 
       exec { 'update_repos':
         command => $update_repos_cmd,
-        require => Exec[add_newrelic_repo_key]
+        require => Exec['add_newrelic_repo_key'],
+        before  => Package['newrelic-sysmond'],
+        unless  => '/usr/bin/test -f /etc/apt/sources.list.d/newrelic.list'
       }
     }
 
     'RedHat': {
       package { 'newrelic-repo':
         ensure    => $package_ensure,
-        provider  => rpm,
-        source    => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm'
-      }
-
-      exec { 'update_repos':
-        command => '/bin/true',
-        require => Package[newrelic-repo]
+        provider  => 'rpm',
+        source    => 'http://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm',
+        before    => Package['newrelic-sysmond']
       }
     }
 
@@ -72,19 +72,21 @@ class newrelic_server_monitor (
   }
 
   package { 'newrelic-sysmond':
-    ensure  => $package_ensure,
-    require => Exec[update_repos]
+    ensure  => $package_ensure
   }
 
-  exec { 'nrsysmond-config':
-    command => "/usr/sbin/nrsysmond-config --set license_key=${license_key}",
-    require => Package[newrelic-sysmond],
-    before  => Service[newrelic-sysmond]
+  file { '/etc/newrelic/nrsysmond.cfg':
+    ensure  => 'present',
+    mode    => '0640',
+    owner   => 'root',
+    group   => 'newrelic',
+    notify  => Service['newrelic-sysmond'],
+    source  => template('newrelic_server_monitor/nrsysmond.cfg.erb')
   }
 
   service { 'newrelic-sysmond':
     ensure  => running,
     enable  => true,
-    require => Package[newrelic-sysmond]
+    require => [ Package['newrelic-sysmond'], File['/etc/newrelic/nrsysmond.cfg'] ]
   }
 }
