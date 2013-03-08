@@ -1,5 +1,5 @@
 name    'plainprogrammer/newrelic_server_monitor'
-version '2.0.2'
+version '2.0.3'
 source 'git://github.com/plainprogrammer/puppet-newrelic_server_monitor'
 author 'James Thompson'
 license 'MIT'
