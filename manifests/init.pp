@@ -52,10 +52,10 @@ class newrelic_server_monitor (
       }
 
       exec { 'update_repos':
-        command       => $update_repos_cmd,
-        require       => Exec['add_newrelic_repo_key'],
-        before        => Package['newrelic-sysmond'],
-        refresh_only  => true,
+        command     => $update_repos_cmd,
+        require     => Exec['add_newrelic_repo_key'],
+        before      => Package['newrelic-sysmond'],
+        refreshonly => true,
       }
     }
 
