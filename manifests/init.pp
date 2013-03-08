@@ -40,20 +40,22 @@ class newrelic_server_monitor (
 
       exec { 'add_newrelic_repo':
         command => $add_repo_cmd,
+        notify  => Exec['update_repos'],
         unless  => '/usr/bin/test -f /etc/apt/sources.list.d/newrelic.list'
       }
 
       exec { 'add_newrelic_repo_key':
         command => $add_repo_key_cmd,
         require => Exec['add_newrelic_repo'],
-        unless  => '/usr/bin/test -f /etc/apt/sources.list.d/newrelic.list'
+        notify  => Exec['update_repos'],
+        unless  => '/usr/bin/test `/usr/bin/apt-key list | /bin/grep 548C16BF -c` -eq 1'
       }
 
       exec { 'update_repos':
-        command => $update_repos_cmd,
-        require => Exec['add_newrelic_repo_key'],
-        before  => Package['newrelic-sysmond'],
-        unless  => '/usr/bin/test -f /etc/apt/sources.list.d/newrelic.list'
+        command       => $update_repos_cmd,
+        require       => Exec['add_newrelic_repo_key'],
+        before        => Package['newrelic-sysmond'],
+        refresh_only  => true,
       }
     }
 
