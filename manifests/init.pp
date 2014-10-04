@@ -83,7 +83,8 @@ class newrelic_server_monitor (
     owner   => 'root',
     group   => 'newrelic',
     notify  => Service['newrelic-sysmond'],
-    content  => template('newrelic_server_monitor/nrsysmond.cfg.erb')
+    content => template('newrelic_server_monitor/nrsysmond.cfg.erb'),
+    require => Package['newrelic-sysmond'],
   }
 
   service { 'newrelic-sysmond':
