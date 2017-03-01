@@ -34,7 +34,7 @@ describe 'newrelic_server_monitor' do
     let(:facts) { { :osfamily  => 'Debian' } }
 
     it { should contain_exec('add_newrelic_repo').with_command('/usr/bin/wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list') }
-    it { should contain_exec('add_newrelic_repo_key').with_command('/usr/bin/apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys 548C16BF') }
+    it { should contain_exec('add_newrelic_repo_key').with_command('/usr/bin/apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-keys 548C16BF') }
     it { should contain_exec('update_repos').with_command('/usr/bin/apt-get update -y -qq') }
   end
 

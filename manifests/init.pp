@@ -35,7 +35,7 @@ class newrelic_server_monitor (
   case $::osfamily {
     'Debian': {
       $add_repo_cmd     = '/usr/bin/wget -O /etc/apt/sources.list.d/newrelic.list http://download.newrelic.com/debian/newrelic.list'
-      $add_repo_key_cmd = '/usr/bin/apt-key adv --keyserver hkp://subkeys.pgp.net --recv-keys 548C16BF'
+      $add_repo_key_cmd = '/usr/bin/apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-keys 548C16BF'
       $update_repos_cmd = '/usr/bin/apt-get update -y -qq'
 
       exec { 'add_newrelic_repo':
